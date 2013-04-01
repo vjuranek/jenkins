@@ -43,6 +43,8 @@ import hudson.util.AtomicFileWriter;
 import hudson.util.IOException2;
 import hudson.util.IOUtils;
 import jenkins.model.Jenkins;
+
+import org.apache.commons.lang.StringUtils;
 import org.apache.tools.ant.taskdefs.Copy;
 import org.apache.tools.ant.types.FileSet;
 import org.kohsuke.stapler.WebMethod;
@@ -54,6 +56,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.StringTokenizer;
 
 import org.kohsuke.stapler.StaplerRequest;
 import org.kohsuke.stapler.StaplerResponse;
@@ -358,7 +361,7 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
 
     /**
      * Called right after when a {@link Item} is loaded from disk.
-     * This is an opporunity to do a post load processing.
+     * This is an opportunity to do a post load processing.
      */
     public void onLoad(ItemGroup<? extends Item> parent, String name) throws IOException {
         this.parent = parent;
@@ -398,7 +401,7 @@ public abstract class AbstractItem extends Actionable implements Item, HttpDelet
     public String getShortUrl() {
         return getParent().getUrlChildPrefix()+'/'+Util.rawEncode(getName())+'/';
     }
-
+    
     public String getSearchUrl() {
         return getShortUrl();
     }
