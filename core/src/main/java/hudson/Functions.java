@@ -919,27 +919,37 @@ public class Functions {
         }
 
         String path = ancestors.get(p);
-        if(path!=null)  return path;
+        if(path!=null) {
+            return normalizeURI(path + '/');
+        }
 
         Item i=p;
         String url = "";
+        Collection<TopLevelItem> viewItems;
+        if (view != null) {
+            viewItems = view.getItems();
+        } else {
+            viewItems = Collections.emptyList();
+        }
         while(true) {
             ItemGroup ig = i.getParent();
             url = i.getShortUrl()+url;
 
-            if(ig== Jenkins.getInstance() || (view != null && ig == view.getOwner())) {
+            if(ig== Jenkins.getInstance() || (view != null && ig == view.getOwnerItemGroup())) {
                 assert i instanceof TopLevelItem;
-                if(view!=null && view.contains((TopLevelItem)i)) {
+                if(viewItems.contains((TopLevelItem)i)) {
                     // if p and the current page belongs to the same view, then return a relative path
-                    return ancestors.get(view)+'/'+url;
+                    return normalizeURI(ancestors.get(view)+'/'+url);
                 } else {
                     // otherwise return a path from the root Hudson
-                    return request.getContextPath()+'/'+p.getUrl();
+                    return normalizeURI(request.getContextPath()+'/'+p.getUrl());
                 }
             }
 
             path = ancestors.get(ig);
-            if(path!=null)  return path+'/'+url;
+            if(path!=null) {
+                return normalizeURI(path+'/'+url);
+            }
 
             assert ig instanceof Item; // if not, ig must have been the Hudson instance
             i = (Item) ig;
