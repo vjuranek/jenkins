@@ -921,6 +921,94 @@ public class Functions {
             i = (Item) ig;
         }
     }
+    
+    private static String normalizeURI(String uri) {
+        return URI.create(uri).normalize().toString();
+    }
+    
+    /**
+     * Gets all the {@link TopLevelItem}s recursively in the {@link ItemGroup} tree.
+     * 
+     * @since 1.512
+     */
+    public static List<TopLevelItem> getAllTopLevelItems(ItemGroup root) {
+      return Items.getAllItems(root, TopLevelItem.class);
+    }
+    
+    /**
+     * Gets the relative name or display name to the given item from the specified group.
+     *
+     * @since 1.515
+     * @param p the Item we want the relative display name
+     * @param g the ItemGroup used as point of reference for the item
+     * @param useDisplayName if true, returns a display name, otherwise returns a name
+     * @return
+     *      String like "foo » bar"
+     */
+    public static String getRelativeNameFrom(Item p, ItemGroup g, boolean useDisplayName) {
+        if (p == null) return null;
+        if (g == null) return useDisplayName ? p.getFullDisplayName() : p.getFullName();
+        String separationString = useDisplayName ? " » " : "/";
+        
+        // first list up all the parents
+        Map<ItemGroup,Integer> parents = new HashMap<ItemGroup,Integer>();
+        int depth=0;
+        while (g!=null) {
+            parents.put(g, depth++);
+            if (g instanceof Item)
+                g = ((Item)g).getParent();
+            else
+                g = null;
+        }
+
+        StringBuilder buf = new StringBuilder();
+        Item i=p;
+        while (true) {
+            if (buf.length()>0) buf.insert(0,separationString);
+            buf.insert(0,useDisplayName ? i.getDisplayName() : i.getName());
+            ItemGroup gr = i.getParent();
+
+            Integer d = parents.get(gr);
+            if (d!=null) {
+                String s="";
+                for (int j=d; j>0; j--)
+                    s+=".." + separationString;
+                return s+buf;
+            }
+
+            if (gr instanceof Item)
+                i = (Item)gr;
+            else
+                return null;
+        }
+    }
+    
+    /**
+     * Gets the name to the given item relative to given group.
+     *
+     * @since 1.515
+     * @param p the Item we want the relative display name
+     * @param g the ItemGroup used as point of reference for the item
+     * @return
+     *      String like "foo » bar"
+     */
+    public static String getRelativeNameFrom(Item p, ItemGroup g) {
+        return getRelativeNameFrom(p, g, false);
+    }    
+    
+    
+    /**
+     * Gets the relative display name to the given item from the specified group.
+     *
+     * @since 1.512
+     * @param p the Item we want the relative display name
+     * @param g the ItemGroup used as point of reference for the item
+     * @return
+     *      String like "foo » bar"
+     */
+    public static String getRelativeDisplayNameFrom(Item p, ItemGroup g) {
+        return getRelativeNameFrom(p, g, true);
+    }
 
     public static Map<Thread,StackTraceElement[]> dumpAllThreads() {
         Map<Thread,StackTraceElement[]> sorted = new TreeMap<Thread,StackTraceElement[]>(new ThreadSorter());
