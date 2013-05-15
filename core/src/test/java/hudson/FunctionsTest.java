@@ -38,11 +38,14 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 
+import jenkins.model.Jenkins;
+
 import hudson.model.Action;
 import static org.junit.Assert.*;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.jvnet.hudson.test.Bug;
+import org.kohsuke.stapler.Ancestor;
 import org.kohsuke.stapler.Stapler;
 import org.kohsuke.stapler.StaplerRequest;
 import org.powermock.modules.junit4.PowerMockRunner;
